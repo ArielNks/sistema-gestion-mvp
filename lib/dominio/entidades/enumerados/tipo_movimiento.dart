@@ -1,0 +1,4 @@
+enum TipoMovimiento {
+  ingreso,
+  egreso;
+}
