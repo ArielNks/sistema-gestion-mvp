@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sistema_gestion/inyeccion_dependencias.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+
+  await inicializarDependencias();
+
   runApp(const Aplicacion());
 }
 
