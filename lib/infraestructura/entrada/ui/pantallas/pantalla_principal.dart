@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_calculadora.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({super.key});
@@ -34,7 +35,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   ];
 
   static const List<String> _textosSeccion = [
-    'Sección: Calculadora',
+    '',
     'Sección: Caja',
     'Sección: Arqueo Diario',
     'Sección: Reportes',
@@ -57,12 +58,14 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
           ),
           const VerticalDivider(thickness: 1, width: 1),
           Expanded(
-            child: Center(
-              child: Text(
-                _textosSeccion[_indiceSeleccionado],
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
+            child: _indiceSeleccionado == 0
+                ? const VistaCalculadora()
+                : Center(
+                    child: Text(
+                      _textosSeccion[_indiceSeleccionado],
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
           ),
         ],
       ),
