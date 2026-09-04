@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_arqueo_diario.dart';
 import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_calculadora.dart';
 import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_caja.dart';
+import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_reportes.dart';
 
 class PantallaPrincipal extends StatefulWidget {
   const PantallaPrincipal({super.key});
@@ -36,13 +37,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     ),
   ];
 
-  static const List<String> _textosSeccion = [
-    '',
-    '',
-    '',
-    'Sección: Reportes',
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,12 +58,8 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
               0 => const VistaCalculadora(),
               1 => const VistaCaja(),
               2 => const VistaArqueoDiario(),
-              _ => Center(
-                  child: Text(
-                    _textosSeccion[_indiceSeleccionado],
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ),
+              3 => const VistaReportes(),
+              _ => const SizedBox.shrink(),
             },
           ),
         ],
