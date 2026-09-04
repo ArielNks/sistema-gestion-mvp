@@ -9,10 +9,10 @@ import 'package:sistema_gestion/aplicacion/casos_uso/registrar_ingreso.dart';
 import 'package:sistema_gestion/dominio/puertos/repositorio_configuracion.dart';
 import 'package:sistema_gestion/dominio/puertos/repositorio_transaccion.dart';
 import 'package:sistema_gestion/dominio/puertos/servicio_pdf.dart';
-import 'package:sistema_gestion/infraestructura/bd/conexion_sqlite.dart';
-import 'package:sistema_gestion/infraestructura/repositorios/repositorio_configuracion_preferences.dart';
-import 'package:sistema_gestion/infraestructura/repositorios/repositorio_transaccion_sqlite.dart';
-import 'package:sistema_gestion/infraestructura/servicios/servicio_pdf_impl.dart';
+import 'package:sistema_gestion/infraestructura/salida/bd/conexion_sqlite.dart';
+import 'package:sistema_gestion/infraestructura/salida/repositorios/repositorio_configuracion_preferences.dart';
+import 'package:sistema_gestion/infraestructura/salida/repositorios/repositorio_transaccion_sqlite.dart';
+import 'package:sistema_gestion/infraestructura/salida/servicios/servicio_pdf_impl.dart';
 
 final GetIt getIt = GetIt.instance;
 

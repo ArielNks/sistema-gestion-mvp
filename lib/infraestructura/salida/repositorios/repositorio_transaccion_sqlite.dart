@@ -4,7 +4,7 @@ import 'package:sistema_gestion/dominio/entidades/resumen_financiero.dart';
 import 'package:sistema_gestion/dominio/entidades/transaccion.dart';
 import 'package:sistema_gestion/dominio/entidades/excepciones/excepciones_dominio.dart';
 import 'package:sistema_gestion/dominio/puertos/repositorio_transaccion.dart';
-import 'package:sistema_gestion/infraestructura/bd/conexion_sqlite.dart';
+import 'package:sistema_gestion/infraestructura/salida/bd/conexion_sqlite.dart';
 import 'package:sqflite/sqflite.dart';
 
 class RepositorioTransaccionSqlite implements RepositorioTransaccion {
