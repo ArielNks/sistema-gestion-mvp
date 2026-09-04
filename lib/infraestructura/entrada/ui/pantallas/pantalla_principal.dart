@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_arqueo_diario.dart';
 import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_calculadora.dart';
 import 'package:sistema_gestion/infraestructura/entrada/ui/vistas/vista_caja.dart';
 
@@ -38,7 +39,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   static const List<String> _textosSeccion = [
     '',
     '',
-    'Sección: Arqueo Diario',
+    '',
     'Sección: Reportes',
   ];
 
@@ -62,6 +63,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             child: switch (_indiceSeleccionado) {
               0 => const VistaCalculadora(),
               1 => const VistaCaja(),
+              2 => const VistaArqueoDiario(),
               _ => Center(
                   child: Text(
                     _textosSeccion[_indiceSeleccionado],
