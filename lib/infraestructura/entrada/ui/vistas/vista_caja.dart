@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:sistema_gestion/aplicacion/casos_uso/consultar_arqueo_diario.dart';
 import 'package:sistema_gestion/aplicacion/casos_uso/registrar_egreso.dart';
 import 'package:sistema_gestion/aplicacion/casos_uso/registrar_ingreso.dart';
 import 'package:sistema_gestion/dominio/entidades/enumerados/medio_pago.dart';
 import 'package:sistema_gestion/dominio/entidades/enumerados/tipo_movimiento.dart'
     as tipo_movimiento;
-//import 'package:sistema_gestion/dominio/entidades/resumen_financiero.dart';
 import 'package:sistema_gestion/dominio/entidades/transaccion.dart';
+import 'package:sistema_gestion/dominio/puertos/repositorio_transaccion.dart';
 import 'package:sistema_gestion/inyeccion_dependencias.dart';
 
 class VistaCaja extends StatefulWidget {
@@ -46,12 +45,13 @@ class _VistaCajaState extends State<VistaCaja> {
 
   Future<void> _cargarUltimosMovimientos() async {
     try {
-      final casoUso = getIt<ConsultarArqueoDiario>();
-      final movimientos = await casoUso.ejecutar(DateTime.now());
-      movimientos.sort((a, b) => b.fechaHora.compareTo(a.fechaHora));
+      final repo = getIt<RepositorioTransaccion>();
+      final transacciones = await repo.obtenerTransaccionesPorFecha(DateTime.now());
+      final lista = List<Transaccion>.from(transacciones);
+      lista.sort((a, b) => b.fechaHora.compareTo(a.fechaHora));
       if (mounted) {
         setState(() {
-          _ultimosMovimientos = movimientos.take(10).toList();
+          _ultimosMovimientos = lista.take(10).toList();
         });
       }
     } catch (e) {

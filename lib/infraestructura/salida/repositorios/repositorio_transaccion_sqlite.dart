@@ -74,6 +74,35 @@ class RepositorioTransaccionSqlite implements RepositorioTransaccion {
   }
 
   @override
+  Future<List<Transaccion>> obtenerTransaccionesPorPeriodo(
+    DateTime fechaInicio,
+    DateTime fechaFin,
+  ) async {
+    try {
+      final db = await _conexion.database;
+
+      final inicioStr = DateTime(fechaInicio.year, fechaInicio.month, fechaInicio.day)
+          .toIso8601String()
+          .substring(0, 10);
+      final finStr = DateTime(fechaFin.year, fechaFin.month, fechaFin.day)
+          .add(const Duration(days: 1))
+          .toIso8601String()
+          .substring(0, 10);
+
+      final resultados = await db.query(
+        'transacciones',
+        where: 'fecha_hora >= ? AND fecha_hora < ?',
+        whereArgs: [inicioStr, finStr],
+        orderBy: 'fecha_hora DESC',
+      );
+
+      return resultados.map(_mapATransaccion).toList();
+    } catch (e) {
+      throw ExcepcionPersistencia('Error al obtener transacciones por período: $e');
+    }
+  }
+
+  @override
   Future<ResumenFinanciero> obtenerResumenPorPeriodo(
     DateTime fechaInicio,
     DateTime fechaFin,
@@ -95,10 +124,10 @@ class RepositorioTransaccionSqlite implements RepositorioTransaccion {
         whereArgs: [inicioStr, finStr],
       );
 
-      double totalIngresos = 0;
-      double totalEgresos = 0;
-      double totalEfectivo = 0;
-      double totalTransferencia = 0;
+      double ingresosEfectivo = 0;
+      double ingresosTransferencia = 0;
+      double egresosEfectivo = 0;
+      double egresosTransferencia = 0;
 
       for (final row in resultados) {
         final monto = (row['monto'] as num).toDouble();
@@ -106,26 +135,38 @@ class RepositorioTransaccionSqlite implements RepositorioTransaccion {
         final medio = row['medio_pago'] as String;
 
         if (tipo == 'ingreso') {
-          totalIngresos += monto;
+          if (medio == 'efectivo') {
+            ingresosEfectivo += monto;
+          } else {
+            ingresosTransferencia += monto;
+          }
         } else {
-          totalEgresos += monto;
-        }
-
-        if (medio == 'efectivo') {
-          totalEfectivo += monto;
-        } else {
-          totalTransferencia += monto;
+          if (medio == 'efectivo') {
+            egresosEfectivo += monto;
+          } else {
+            egresosTransferencia += monto;
+          }
         }
       }
+
+      final totalIngresos = ingresosEfectivo + ingresosTransferencia;
+      final totalEgresos = egresosEfectivo + egresosTransferencia;
+      final balanceNeto = totalIngresos - totalEgresos;
+      final totalEfectivo = ingresosEfectivo - egresosEfectivo;
+      final totalTransferencia = ingresosTransferencia - egresosTransferencia;
 
       return ResumenFinanciero(
         fechaInicio: fechaInicio,
         fechaFin: fechaFin,
         totalIngresos: totalIngresos,
         totalEgresos: totalEgresos,
-        balanceNeto: totalIngresos - totalEgresos,
+        balanceNeto: balanceNeto,
         totalEfectivo: totalEfectivo,
         totalTransferencia: totalTransferencia,
+        ingresosEfectivo: ingresosEfectivo,
+        ingresosTransferencia: ingresosTransferencia,
+        egresosEfectivo: egresosEfectivo,
+        egresosTransferencia: egresosTransferencia,
       );
     } catch (e) {
       throw ExcepcionPersistencia('Error al obtener resumen por período: $e');

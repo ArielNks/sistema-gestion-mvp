@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:sistema_gestion/aplicacion/casos_uso/consultar_arqueo_diario.dart';
 import 'package:sistema_gestion/dominio/entidades/enumerados/medio_pago.dart';
 import 'package:sistema_gestion/dominio/entidades/enumerados/tipo_movimiento.dart';
+import 'package:sistema_gestion/dominio/entidades/resumen_financiero.dart';
 import 'package:sistema_gestion/dominio/entidades/transaccion.dart';
+import 'package:sistema_gestion/dominio/puertos/repositorio_transaccion.dart';
 import 'package:sistema_gestion/inyeccion_dependencias.dart';
 
 class VistaArqueoDiario extends StatefulWidget {
@@ -14,6 +16,7 @@ class VistaArqueoDiario extends StatefulWidget {
 
 class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
   DateTime _fechaSeleccionada = DateTime.now();
+  ResumenFinanciero? _reporte;
   List<Transaccion> _transacciones = [];
   bool _isCargando = false;
   String? _error;
@@ -21,10 +24,10 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
   @override
   void initState() {
     super.initState();
-    _cargarTransacciones();
+    _cargarArqueo();
   }
 
-  Future<void> _cargarTransacciones() async {
+  Future<void> _cargarArqueo() async {
     setState(() {
       _isCargando = true;
       _error = null;
@@ -32,10 +35,10 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
 
     try {
       final casoUso = getIt<ConsultarArqueoDiario>();
-      final resultado = await casoUso.ejecutar(_fechaSeleccionada);
+      final reporte = await casoUso.ejecutar(_fechaSeleccionada);
       if (mounted) {
         setState(() {
-          _transacciones = resultado;
+          _reporte = reporte;
           _isCargando = false;
         });
       }
@@ -58,7 +61,7 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
     );
     if (fecha != null && fecha != _fechaSeleccionada) {
       setState(() => _fechaSeleccionada = fecha);
-      _cargarTransacciones();
+      _cargarArqueo();
     }
   }
 
@@ -75,34 +78,6 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (match) => '${match[1]},',
     )}';
-  }
-
-  double _calcularTotalIngresos() {
-    return _transacciones
-        .where((t) => t.tipoMovimiento == TipoMovimiento.ingreso)
-        .fold(0.0, (sum, t) => sum + t.monto);
-  }
-
-  double _calcularTotalEgresos() {
-    return _transacciones
-        .where((t) => t.tipoMovimiento == TipoMovimiento.egreso)
-        .fold(0.0, (sum, t) => sum + t.monto);
-  }
-
-  double _calcularSaldoEfectivo() {
-    return _transacciones
-        .where((t) => t.medioPago == MedioPago.efectivo)
-        .fold(0.0, (sum, t) => sum + t.monto);
-  }
-
-  double _calcularSaldoTransferencia() {
-    return _transacciones
-        .where((t) => t.medioPago == MedioPago.transferencia)
-        .fold(0.0, (sum, t) => sum + t.monto);
-  }
-
-  double _calcularBalance() {
-    return _calcularTotalIngresos() - _calcularTotalEgresos();
   }
 
   @override
@@ -132,60 +107,110 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
           ),
           const SizedBox(height: 24),
           if (_isCargando)
-            const Center(child: CircularProgressIndicator())
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (_error != null)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    _error!,
-                    style: TextStyle(color: colorScheme.error),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _cargarTransacciones,
-                    child: const Text('Reintentar'),
-                  ),
-                ],
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+                    const SizedBox(height: 16),
+                    Text(
+                      _error!,
+                      style: TextStyle(color: colorScheme.error),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _cargarArqueo,
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
               ),
             )
-          else ...[
-            _buildResumenCards(),
+          else if (_reporte != null) ...[
+            _buildResumenCards(_reporte!),
             const SizedBox(height: 24),
-            _buildListaTransacciones(),
-          ],
+            Expanded(child: _buildListaTransacciones()),
+          ] else
+            const Expanded(
+              child: Center(
+                child: Text('No hay datos disponibles'),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildResumenCards() {
-    final totalIngresos = _calcularTotalIngresos();
-    final totalEgresos = _calcularTotalEgresos();
-    final saldoEfectivo = _calcularSaldoEfectivo();
-    final saldoTransferencia = _calcularSaldoTransferencia();
-    final balance = _calcularBalance();
-
-    return Row(
+  Widget _buildResumenCards(ResumenFinanciero r) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
       children: [
-        Expanded(child: _buildResumenCard('Total Ingresos', _formatearMonto(totalIngresos), Colors.green, Icons.arrow_downward)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Total Egresos', _formatearMonto(totalEgresos), Colors.red, Icons.arrow_upward)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Saldo Efectivo', _formatearMonto(saldoEfectivo), Colors.blue, Icons.money)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Saldo Transferencia', _formatearMonto(saldoTransferencia), Colors.purple, Icons.account_balance)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Balance Total', _formatearMonto(balance), balance >= 0 ? Colors.green : Colors.red, Icons.balance)),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Total Ingresos',
+            _formatearMonto(r.totalIngresos),
+            'Ef: ${_formatearMonto(r.ingresosEfectivo)} | Transf: ${_formatearMonto(r.ingresosTransferencia)}',
+            Colors.green,
+            Icons.arrow_downward,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Total Egresos',
+            _formatearMonto(r.totalEgresos),
+            'Ef: ${_formatearMonto(r.egresosEfectivo)} | Transf: ${_formatearMonto(r.egresosTransferencia)}',
+            Colors.red,
+            Icons.arrow_upward,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Saldo Efectivo',
+            _formatearMonto(r.totalEfectivo),
+            'Ing: ${_formatearMonto(r.ingresosEfectivo)} - Egr: ${_formatearMonto(r.egresosEfectivo)}',
+            Colors.blue,
+            Icons.money,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Saldo Transferencia',
+            _formatearMonto(r.totalTransferencia),
+            'Ing: ${_formatearMonto(r.ingresosTransferencia)} - Egr: ${_formatearMonto(r.egresosTransferencia)}',
+            Colors.purple,
+            Icons.account_balance,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Balance Total',
+            _formatearMonto(r.balanceNeto),
+            'Ingresos: ${_formatearMonto(r.totalIngresos)} - Egresos: ${_formatearMonto(r.totalEgresos)}',
+            r.balanceNeto >= 0 ? Colors.green : Colors.red,
+            Icons.balance,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildResumenCard(String titulo, String valor, Color color, IconData icon) {
+  Widget _buildResumenCard(
+    String titulo,
+    String valor,
+    String detalle,
+    Color color,
+    IconData icon,
+  ) {
     return Card(
       elevation: 2,
       child: Padding(
@@ -207,12 +232,19 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               valor,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: color,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              detalle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
           ],
@@ -222,80 +254,123 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
   }
 
   Widget _buildListaTransacciones() {
-    if (_transacciones.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.receipt_long, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
-            const SizedBox(height: 16),
-            Text(
-              'Sin movimientos registrados en esta fecha',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+    // Obtener transacciones del repositorio para mostrar la lista detallada
+    return FutureBuilder<List<Transaccion>>(
+      future: getIt<RepositorioTransaccion>().obtenerTransaccionesPorFecha(_fechaSeleccionada),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+                const SizedBox(height: 16),
+                Text('Error al cargar movimientos: ${snapshot.error}'),
+                const SizedBox(height: 16),
+                FilledButton(onPressed: _cargarArqueo, child: const Text('Reintentar')),
+              ],
+            ),
+          );
+        }
+        _transacciones = snapshot.data ?? [];
+
+        if (_transacciones.isEmpty) {
+          return Card(
+            elevation: 2,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.receipt_long,
+                    size: 64,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No hay movimientos registrados en esta fecha',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      );
-    }
+          );
+        }
 
-    return Card(
-      elevation: 2,
-      child: Column(
-        children: [
-          DataTable(
-            columnSpacing: 16,
-            headingRowColor: WidgetStatePropertyAll(Colors.grey),
-            columns: [
-              DataColumn(label: Text('Hora', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Tipo', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Medio Pago', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Monto', style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right), numeric: true),
-              DataColumn(label: Text('Descripción', style: TextStyle(fontWeight: FontWeight.bold))),
+        return Card(
+          elevation: 2,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Movimientos del día',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _transacciones.length,
+                  itemBuilder: (context, index) {
+                    final t = _transacciones[index];
+                    final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
+                    return ListTile(
+                      dense: true,
+                      leading: Icon(
+                        esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
+                        color: esIngreso ? Colors.green : Colors.red,
+                      ),
+                      title: Text(_formatearHora(t.fechaHora)),
+                      subtitle: Text(
+                        t.descripcion ?? 'Sin descripción',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            _formatearMonto(t.monto),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: esIngreso ? Colors.green : Colors.red,
+                            ),
+                          ),
+                          Text(
+                            t.medioPago == MedioPago.efectivo ? 'Efectivo' : 'Transferencia',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                      onTap: () => _mostrarDetalle(t),
+                    );
+                  },
+                ),
+              ),
             ],
-            rows: [],
           ),
-          const Divider(height: 1),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _transacciones.length,
-              itemBuilder: (context, index) {
-                final t = _transacciones[index];
-                final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
-                return ListTile(
-                  leading: Icon(
-                    esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
-                    color: esIngreso ? Colors.green : Colors.red,
-                  ),
-                  title: Text(_formatearHora(t.fechaHora)),
-                  subtitle: Text(
-                    t.descripcion ?? 'Sin descripción',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: Text(
-                    _formatearMonto(t.monto),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: esIngreso ? Colors.green : Colors.red,
-                    ),
-                  ),
-                  onTap: () => _mostrarDetalle(t),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   void _mostrarDetalle(Transaccion t) {
+    final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(t.tipoMovimiento == TipoMovimiento.ingreso ? 'Detalle Ingreso' : 'Detalle Egreso'),
+        title: Text(esIngreso ? 'Detalle Ingreso' : 'Detalle Egreso'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

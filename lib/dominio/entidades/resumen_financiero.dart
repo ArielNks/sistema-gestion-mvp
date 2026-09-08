@@ -7,6 +7,10 @@ class ResumenFinanciero {
     required this.balanceNeto,
     required this.totalEfectivo,
     required this.totalTransferencia,
+    required this.ingresosEfectivo,
+    required this.ingresosTransferencia,
+    required this.egresosEfectivo,
+    required this.egresosTransferencia,
   });
 
   final DateTime fechaInicio;
@@ -16,6 +20,10 @@ class ResumenFinanciero {
   final double balanceNeto;
   final double totalEfectivo;
   final double totalTransferencia;
+  final double ingresosEfectivo;
+  final double ingresosTransferencia;
+  final double egresosEfectivo;
+  final double egresosTransferencia;
 
   @override
   bool operator ==(Object other) =>
@@ -28,7 +36,11 @@ class ResumenFinanciero {
           totalEgresos == other.totalEgresos &&
           balanceNeto == other.balanceNeto &&
           totalEfectivo == other.totalEfectivo &&
-          totalTransferencia == other.totalTransferencia;
+          totalTransferencia == other.totalTransferencia &&
+          ingresosEfectivo == other.ingresosEfectivo &&
+          ingresosTransferencia == other.ingresosTransferencia &&
+          egresosEfectivo == other.egresosEfectivo &&
+          egresosTransferencia == other.egresosTransferencia;
 
   @override
   int get hashCode =>
@@ -38,9 +50,13 @@ class ResumenFinanciero {
       totalEgresos.hashCode ^
       balanceNeto.hashCode ^
       totalEfectivo.hashCode ^
-      totalTransferencia.hashCode;
+      totalTransferencia.hashCode ^
+      ingresosEfectivo.hashCode ^
+      ingresosTransferencia.hashCode ^
+      egresosEfectivo.hashCode ^
+      egresosTransferencia.hashCode;
 
   @override
   String toString() =>
-      'ResumenFinanciero(fechaInicio: $fechaInicio, fechaFin: $fechaFin, totalIngresos: $totalIngresos, totalEgresos: $totalEgresos, balanceNeto: $balanceNeto, totalEfectivo: $totalEfectivo, totalTransferencia: $totalTransferencia)';
+      'ResumenFinanciero(fechaInicio: $fechaInicio, fechaFin: $fechaFin, totalIngresos: $totalIngresos, totalEgresos: $totalEgresos, balanceNeto: $balanceNeto, totalEfectivo: $totalEfectivo, totalTransferencia: $totalTransferencia, ingresosEfectivo: $ingresosEfectivo, ingresosTransferencia: $ingresosTransferencia, egresosEfectivo: $egresosEfectivo, egresosTransferencia: $egresosTransferencia)';
 }

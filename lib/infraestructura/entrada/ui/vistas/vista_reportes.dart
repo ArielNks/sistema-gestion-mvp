@@ -213,22 +213,71 @@ class _VistaReportesState extends State<VistaReportes> {
   Widget _buildResumenCards() {
     final r = _reporte!;
 
-    return Row(
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
       children: [
-        Expanded(child: _buildResumenCard('Total Ingresos', _formatearMonto(r.totalIngresos), Colors.green, Icons.arrow_downward)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Total Egresos', _formatearMonto(r.totalEgresos), Colors.red, Icons.arrow_upward)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Balance Neto', _formatearMonto(r.balanceNeto), r.balanceNeto >= 0 ? Colors.green : Colors.red, Icons.balance)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Total Efectivo', _formatearMonto(r.totalEfectivo), Colors.blue, Icons.money)),
-        const SizedBox(width: 16),
-        Expanded(child: _buildResumenCard('Total Transferencia', _formatearMonto(r.totalTransferencia), Colors.purple, Icons.account_balance)),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Total Ingresos',
+            _formatearMonto(r.totalIngresos),
+            'Ef: ${_formatearMonto(r.ingresosEfectivo)} | Transf: ${_formatearMonto(r.ingresosTransferencia)}',
+            Colors.green,
+            Icons.arrow_downward,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Total Egresos',
+            _formatearMonto(r.totalEgresos),
+            'Ef: ${_formatearMonto(r.egresosEfectivo)} | Transf: ${_formatearMonto(r.egresosTransferencia)}',
+            Colors.red,
+            Icons.arrow_upward,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Saldo Efectivo',
+            _formatearMonto(r.totalEfectivo),
+            'Ing: ${_formatearMonto(r.ingresosEfectivo)} - Egr: ${_formatearMonto(r.egresosEfectivo)}',
+            Colors.blue,
+            Icons.money,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Saldo Transferencia',
+            _formatearMonto(r.totalTransferencia),
+            'Ing: ${_formatearMonto(r.ingresosTransferencia)} - Egr: ${_formatearMonto(r.egresosTransferencia)}',
+            Colors.purple,
+            Icons.account_balance,
+          ),
+        ),
+        SizedBox(
+          width: 280,
+          child: _buildResumenCard(
+            'Balance Total',
+            _formatearMonto(r.balanceNeto),
+            'Ingresos: ${_formatearMonto(r.totalIngresos)} - Egresos: ${_formatearMonto(r.totalEgresos)}',
+            r.balanceNeto >= 0 ? Colors.green : Colors.red,
+            Icons.balance,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildResumenCard(String titulo, String valor, Color color, IconData icon) {
+  Widget _buildResumenCard(
+    String titulo,
+    String valor,
+    String detalle,
+    Color color,
+    IconData icon,
+  ) {
     return Card(
       elevation: 2,
       child: Padding(
@@ -250,12 +299,19 @@ class _VistaReportesState extends State<VistaReportes> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               valor,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: color,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              detalle,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
           ],
