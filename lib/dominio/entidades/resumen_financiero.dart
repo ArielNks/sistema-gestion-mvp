@@ -1,3 +1,5 @@
+import 'package:sistema_gestion/dominio/entidades/transaccion.dart';
+
 class ResumenFinanciero {
   const ResumenFinanciero({
     required this.fechaInicio,
@@ -11,6 +13,7 @@ class ResumenFinanciero {
     required this.ingresosTransferencia,
     required this.egresosEfectivo,
     required this.egresosTransferencia,
+    required this.transacciones,
   });
 
   final DateTime fechaInicio;
@@ -24,6 +27,7 @@ class ResumenFinanciero {
   final double ingresosTransferencia;
   final double egresosEfectivo;
   final double egresosTransferencia;
+  final List<Transaccion> transacciones;
 
   @override
   bool operator ==(Object other) =>
@@ -40,7 +44,8 @@ class ResumenFinanciero {
           ingresosEfectivo == other.ingresosEfectivo &&
           ingresosTransferencia == other.ingresosTransferencia &&
           egresosEfectivo == other.egresosEfectivo &&
-          egresosTransferencia == other.egresosTransferencia;
+          egresosTransferencia == other.egresosTransferencia &&
+          transacciones == other.transacciones;
 
   @override
   int get hashCode =>
@@ -54,9 +59,10 @@ class ResumenFinanciero {
       ingresosEfectivo.hashCode ^
       ingresosTransferencia.hashCode ^
       egresosEfectivo.hashCode ^
-      egresosTransferencia.hashCode;
+      egresosTransferencia.hashCode ^
+      transacciones.hashCode;
 
   @override
   String toString() =>
-      'ResumenFinanciero(fechaInicio: $fechaInicio, fechaFin: $fechaFin, totalIngresos: $totalIngresos, totalEgresos: $totalEgresos, balanceNeto: $balanceNeto, totalEfectivo: $totalEfectivo, totalTransferencia: $totalTransferencia, ingresosEfectivo: $ingresosEfectivo, ingresosTransferencia: $ingresosTransferencia, egresosEfectivo: $egresosEfectivo, egresosTransferencia: $egresosTransferencia)';
+      'ResumenFinanciero(fechaInicio: $fechaInicio, fechaFin: $fechaFin, totalIngresos: $totalIngresos, totalEgresos: $totalEgresos, balanceNeto: $balanceNeto, totalEfectivo: $totalEfectivo, totalTransferencia: $totalTransferencia, ingresosEfectivo: $ingresosEfectivo, ingresosTransferencia: $ingresosTransferencia, egresosEfectivo: $egresosEfectivo, egresosTransferencia: $egresosTransferencia, transacciones: $transacciones)';
 }

@@ -167,6 +167,7 @@ class RepositorioTransaccionSqlite implements RepositorioTransaccion {
         ingresosTransferencia: ingresosTransferencia,
         egresosEfectivo: egresosEfectivo,
         egresosTransferencia: egresosTransferencia,
+        transacciones: const [],
       );
     } catch (e) {
       throw ExcepcionPersistencia('Error al obtener resumen por período: $e');

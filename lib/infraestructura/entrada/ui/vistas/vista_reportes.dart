@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sistema_gestion/aplicacion/casos_uso/consultar_reporte_periodo.dart';
 import 'package:sistema_gestion/aplicacion/casos_uso/exportar_reporte_pdf.dart';
+import 'package:sistema_gestion/dominio/entidades/enumerados/medio_pago.dart';
+import 'package:sistema_gestion/dominio/entidades/enumerados/tipo_movimiento.dart';
 import 'package:sistema_gestion/dominio/entidades/resumen_financiero.dart';
+import 'package:sistema_gestion/dominio/entidades/transaccion.dart';
 import 'package:sistema_gestion/inyeccion_dependencias.dart';
 
 class VistaReportes extends StatefulWidget {
@@ -114,6 +117,10 @@ class _VistaReportesState extends State<VistaReportes> {
     return '${fecha.day.toString().padLeft(2, '0')}/${fecha.month.toString().padLeft(2, '0')}/${fecha.year}';
   }
 
+  String _formatearFechaHora(DateTime fecha) {
+    return '${_formatearFecha(fecha)} ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
+  }
+
   String _formatearMonto(double monto) {
     return '\$${monto.toStringAsFixed(2).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -162,48 +169,73 @@ class _VistaReportesState extends State<VistaReportes> {
           ),
           const SizedBox(height: 24),
           if (_isCargando)
-            const Center(child: CircularProgressIndicator())
+            const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (_error != null)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    _error!,
-                    style: TextStyle(color: colorScheme.error),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _consultarReporte,
-                    child: const Text('Reintentar'),
-                  ),
-                ],
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+                    const SizedBox(height: 16),
+                    Text(
+                      _error!,
+                      style: TextStyle(color: colorScheme.error),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _consultarReporte,
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
               ),
             )
           else if (_reporte == null)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.analytics, size: 64, color: colorScheme.onSurfaceVariant),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Seleccione un rango de fechas y presione "Consultar Reporte"',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+            const Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.analytics, size: 64, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'Seleccione un rango de fechas y presione "Consultar Reporte"',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             )
           else ...[
             _buildResumenCards(),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FilledButton.icon(
+                  onPressed: _isExportando ? null : _exportarPdf,
+                  icon: _isExportando
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(Icons.picture_as_pdf),
+                  label: const Text('Exportar a PDF / Imprimir'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    backgroundColor: Colors.indigo,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
-            _buildExportarButton(),
+            Expanded(child: _buildListaTransacciones()),
           ],
         ],
       ),
@@ -320,29 +352,142 @@ class _VistaReportesState extends State<VistaReportes> {
     );
   }
 
-  Widget _buildExportarButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        FilledButton.icon(
-          onPressed: _isExportando ? null : _exportarPdf,
-          icon: _isExportando
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Icon(Icons.picture_as_pdf),
-          label: const Text('Exportar a PDF / Imprimir'),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            backgroundColor: Colors.indigo,
+  Widget _buildListaTransacciones() {
+    final transacciones = _reporte!.transacciones;
+
+    if (transacciones.isEmpty) {
+      return Card(
+        elevation: 2,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(48),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.receipt_long,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Sin movimientos registrados en este rango de fechas',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
-      ],
+      );
+    }
+
+    return Card(
+      elevation: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'Movimientos del Período (${transacciones.length})',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: ListView.builder(
+              itemCount: transacciones.length,
+              itemBuilder: (context, index) {
+                final t = transacciones[index];
+                final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
+                return ListTile(
+                  dense: true,
+                  leading: Icon(
+                    esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
+                    color: esIngreso ? Colors.green : Colors.red,
+                  ),
+                  title: Text(_formatearFechaHora(t.fechaHora)),
+                  subtitle: Text(
+                    t.descripcion ?? 'Sin descripción',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        _formatearMonto(t.monto),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: esIngreso ? Colors.green : Colors.red,
+                        ),
+                      ),
+                      Text(
+                        t.medioPago == MedioPago.efectivo ? 'Efectivo' : 'Transferencia',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                  onTap: () => _mostrarDetalle(t),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _mostrarDetalle(Transaccion t) {
+    final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(esIngreso ? 'Detalle Ingreso' : 'Detalle Egreso'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetalleFila('Monto', _formatearMonto(t.monto)),
+            _buildDetalleFila('Medio de Pago', t.medioPago == MedioPago.efectivo ? 'Efectivo' : 'Transferencia'),
+            _buildDetalleFila('Fecha y Hora', _formatearFechaHora(t.fechaHora)),
+            if (t.descripcion != null) _buildDetalleFila('Descripción', t.descripcion!),
+            if (t.id != null) _buildDetalleFila('ID', t.id.toString()),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetalleFila(String etiqueta, String valor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$etiqueta:',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          ),
+          Expanded(child: Text(valor)),
+        ],
+      ),
     );
   }
 }

@@ -50,6 +50,7 @@ class ConsultarArqueoDiario {
       ingresosTransferencia: ingresosTransferencia,
       egresosEfectivo: egresosEfectivo,
       egresosTransferencia: egresosTransferencia,
+      transacciones: transacciones,
     );
   }
 }

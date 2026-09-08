@@ -56,6 +56,7 @@ class ConsultarReportePeriodo {
       ingresosTransferencia: ingresosTransferencia,
       egresosEfectivo: egresosEfectivo,
       egresosTransferencia: egresosTransferencia,
+      transacciones: transacciones,
     );
   }
 }
