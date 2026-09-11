@@ -73,6 +73,10 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
     return '${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}';
   }
 
+  String _formatearFechaHora(DateTime fecha) {
+    return '${_formatearFecha(fecha)} ${_formatearHora(fecha)}';
+  }
+
   String _formatearMonto(double monto) {
     return '\$${monto.toStringAsFixed(2).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -95,36 +99,44 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
                 'Arqueo Diario',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: 28,
                     ),
               ),
               const Spacer(),
               OutlinedButton.icon(
                 onPressed: _seleccionarFecha,
-                icon: const Icon(Icons.calendar_today),
-                label: Text(_formatearFecha(_fechaSeleccionada)),
+                icon: const Icon(Icons.calendar_today, size: 20),
+                label: Text(_formatearFecha(_fechaSeleccionada), style: const TextStyle(fontSize: 15)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           if (_isCargando)
-            const Expanded(child: Center(child: CircularProgressIndicator()))
+            const Expanded(child: Center(child: CircularProgressIndicator(strokeWidth: 3)))
           else if (_error != null)
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+                    Icon(Icons.error_outline, size: 72, color: colorScheme.error),
                     const SizedBox(height: 16),
                     Text(
                       _error!,
-                      style: TextStyle(color: colorScheme.error),
+                      style: TextStyle(color: colorScheme.error, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
                     FilledButton(
                       onPressed: _cargarArqueo,
-                      child: const Text('Reintentar'),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text('Reintentar', style: TextStyle(fontSize: 16)),
                     ),
                   ],
                 ),
@@ -137,7 +149,7 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
           ] else
             const Expanded(
               child: Center(
-                child: Text('No hay datos disponibles'),
+                child: Text('No hay datos disponibles', style: TextStyle(fontSize: 17, color: Colors.grey)),
               ),
             ),
         ],
@@ -146,58 +158,71 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
   }
 
   Widget _buildResumenCards(ResumenFinanciero r) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
+    return Column(
       children: [
-        SizedBox(
-          width: 280,
-          child: _buildResumenCard(
-            'Total Ingresos',
-            _formatearMonto(r.totalIngresos),
-            'Ef: ${_formatearMonto(r.ingresosEfectivo)} | Transf: ${_formatearMonto(r.ingresosTransferencia)}',
-            Colors.green,
-            Icons.arrow_downward,
-          ),
-        ),
-        SizedBox(
-          width: 280,
-          child: _buildResumenCard(
-            'Total Egresos',
-            _formatearMonto(r.totalEgresos),
-            'Ef: ${_formatearMonto(r.egresosEfectivo)} | Transf: ${_formatearMonto(r.egresosTransferencia)}',
-            Colors.red,
-            Icons.arrow_upward,
-          ),
-        ),
-        SizedBox(
-          width: 280,
-          child: _buildResumenCard(
-            'Saldo Efectivo',
-            _formatearMonto(r.totalEfectivo),
-            'Ing: ${_formatearMonto(r.ingresosEfectivo)} - Egr: ${_formatearMonto(r.egresosEfectivo)}',
-            Colors.blue,
-            Icons.money,
-          ),
-        ),
-        SizedBox(
-          width: 280,
-          child: _buildResumenCard(
-            'Saldo Transferencia',
-            _formatearMonto(r.totalTransferencia),
-            'Ing: ${_formatearMonto(r.ingresosTransferencia)} - Egr: ${_formatearMonto(r.egresosTransferencia)}',
-            Colors.purple,
-            Icons.account_balance,
-          ),
-        ),
-        SizedBox(
-          width: 280,
-          child: _buildResumenCard(
-            'Balance Total',
-            _formatearMonto(r.balanceNeto),
-            'Ingresos: ${_formatearMonto(r.totalIngresos)} - Egresos: ${_formatearMonto(r.totalEgresos)}',
-            r.balanceNeto >= 0 ? Colors.green : Colors.red,
-            Icons.balance,
+        IntrinsicHeight(
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: _buildResumenCard(
+                    'Total Ingresos',
+                    _formatearMonto(r.totalIngresos),
+                    'Ef: ${_formatearMonto(r.ingresosEfectivo)} | Transf: ${_formatearMonto(r.ingresosTransferencia)}',
+                    Colors.green,
+                    Icons.arrow_downward,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: _buildResumenCard(
+                    'Total Egresos',
+                    _formatearMonto(r.totalEgresos),
+                    'Ef: ${_formatearMonto(r.egresosEfectivo)} | Transf: ${_formatearMonto(r.egresosTransferencia)}',
+                    Colors.red,
+                    Icons.arrow_upward,
+                  ),
+                ),
+              ),
+              const VerticalDivider(color: Colors.grey, thickness: 2, width: 40, indent: 8, endIndent: 8),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: _buildResumenCard(
+                    'Saldo Efectivo',
+                    _formatearMonto(r.totalEfectivo),
+                    'Ing: ${_formatearMonto(r.ingresosEfectivo)} - Egr: ${_formatearMonto(r.egresosEfectivo)}',
+                    Colors.blue,
+                    Icons.money,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: _buildResumenCard(
+                    'Saldo Transferencia',
+                    _formatearMonto(r.totalTransferencia),
+                    'Ing: ${_formatearMonto(r.ingresosTransferencia)} - Egr: ${_formatearMonto(r.egresosTransferencia)}',
+                    Colors.purple,
+                    Icons.account_balance,
+                  ),
+                ),
+              ),
+              const VerticalDivider(color: Colors.grey, thickness: 2, width: 40, indent: 8, endIndent: 8),
+              Expanded(
+                child: _buildResumenCard(
+                  'Balance Total',
+                  _formatearMonto(r.balanceNeto),
+                  'Ingresos: ${_formatearMonto(r.totalIngresos)} - Egresos: ${_formatearMonto(r.totalEgresos)}',
+                  r.balanceNeto >= 0 ? Colors.green : Colors.red,
+                  Icons.balance,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -211,40 +236,53 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
     Color color,
     IconData icon,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
-      elevation: 2,
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     titulo,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
             Text(
               valor,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: color,
+                    fontSize: 28,
                   ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               detalle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 13,
                   ),
             ),
           ],
@@ -254,23 +292,29 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
   }
 
   Widget _buildListaTransacciones() {
-    // Obtener transacciones del repositorio para mostrar la lista detallada
     return FutureBuilder<List<Transaccion>>(
       future: getIt<RepositorioTransaccion>().obtenerTransaccionesPorFecha(_fechaSeleccionada),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(strokeWidth: 3));
         }
         if (snapshot.hasError) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+                Icon(Icons.error_outline, size: 72, color: Theme.of(context).colorScheme.error),
                 const SizedBox(height: 16),
-                Text('Error al cargar movimientos: ${snapshot.error}'),
+                Text('Error al cargar movimientos: ${snapshot.error}', style: const TextStyle(fontSize: 15), textAlign: TextAlign.center),
                 const SizedBox(height: 16),
-                FilledButton(onPressed: _cargarArqueo, child: const Text('Reintentar')),
+                FilledButton(
+                  onPressed: _cargarArqueo,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('Reintentar', style: TextStyle(fontSize: 16)),
+                ),
               ],
             ),
           );
@@ -279,81 +323,132 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
 
         if (_transacciones.isEmpty) {
           return Card(
-            elevation: 2,
+            elevation: 3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.receipt_long,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No hay movimientos registrados en esta fecha',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(56),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.receipt_long,
+                      size: 72,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Sin movimientos registrados en esta fecha',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontSize: 17,
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
         }
 
         return Card(
-          elevation: 2,
+          elevation: 3,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 child: Text(
-                  'Movimientos del día',
+                  'Movimientos del día (${_transacciones.length})',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
+                        fontSize: 20,
                       ),
                 ),
               ),
-              const Divider(height: 1),
+              const Divider(height: 1, thickness: 1),
               Expanded(
-                child: ListView.builder(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: _transacciones.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 16, endIndent: 16),
                   itemBuilder: (context, index) {
                     final t = _transacciones[index];
                     final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
-                    return ListTile(
-                      dense: true,
-                      leading: Icon(
-                        esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
-                        color: esIngreso ? Colors.green : Colors.red,
-                      ),
-                      title: Text(_formatearHora(t.fechaHora)),
-                      subtitle: Text(
-                        t.descripcion ?? 'Sin descripción',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Row(
                         children: [
-                          Text(
-                            _formatearMonto(t.monto),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: (esIngreso ? Colors.green : Colors.red).withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
                               color: esIngreso ? Colors.green : Colors.red,
+                              size: 24,
                             ),
                           ),
-                          Text(
-                            t.medioPago == MedioPago.efectivo ? 'Efectivo' : 'Transferencia',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _formatearFechaHora(t.fechaHora),
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  t.descripcion ?? 'Sin descripción',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                _formatearMonto(t.monto),
+                                style: TextStyle(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.bold,
+                                  color: esIngreso ? Colors.green : Colors.red,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: (t.medioPago == MedioPago.efectivo ? Colors.blue : Colors.purple).withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  t.medioPago == MedioPago.efectivo ? 'Efectivo' : 'Transferencia',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: t.medioPago == MedioPago.efectivo ? Colors.blue : Colors.purple,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      onTap: () => _mostrarDetalle(t),
                     );
                   },
                 ),
@@ -362,52 +457,6 @@ class _VistaArqueoDiarioState extends State<VistaArqueoDiario> {
           ),
         );
       },
-    );
-  }
-
-  void _mostrarDetalle(Transaccion t) {
-    final esIngreso = t.tipoMovimiento == TipoMovimiento.ingreso;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(esIngreso ? 'Detalle Ingreso' : 'Detalle Egreso'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetalleFila('Monto', _formatearMonto(t.monto)),
-            _buildDetalleFila('Medio de Pago', t.medioPago == MedioPago.efectivo ? 'Efectivo' : 'Transferencia'),
-            _buildDetalleFila('Fecha y Hora', '${_formatearFecha(t.fechaHora)} ${_formatearHora(t.fechaHora)}'),
-            if (t.descripcion != null) _buildDetalleFila('Descripción', t.descripcion!),
-            if (t.id != null) _buildDetalleFila('ID', t.id.toString()),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetalleFila(String etiqueta, String valor) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              '$etiqueta:',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(child: Text(valor)),
-        ],
-      ),
     );
   }
 }

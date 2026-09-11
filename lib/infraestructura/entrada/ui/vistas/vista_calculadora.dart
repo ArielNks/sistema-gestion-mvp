@@ -108,10 +108,13 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
         children: [
           TextFormField(
             controller: _costoTotalUnidadController,
+            style: const TextStyle(fontSize: 18),
             decoration: const InputDecoration(
               labelText: 'Costo Total (\$)',
+              labelStyle: TextStyle(fontSize: 16),
               prefixIcon: Icon(Icons.attach_money),
               border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
@@ -128,10 +131,13 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _margenUnidadController,
+            style: const TextStyle(fontSize: 18),
             decoration: const InputDecoration(
               labelText: 'Margen de Ganancia (%)',
+              labelStyle: TextStyle(fontSize: 16),
               prefixIcon: Icon(Icons.percent),
               border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
@@ -145,22 +151,23 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
               return null;
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           FilledButton.icon(
             onPressed: _isCalculando ? null : _calcularUnidad,
             icon: _isCalculando
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
-                : const Icon(Icons.calculate),
-            label: const Text('Calcular'),
+                : const Icon(Icons.calculate, size: 22),
+            label: const Text('Calcular', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           if (_resultadoUnidad != null) _buildResultadoUnidad(),
         ],
       ),
@@ -170,31 +177,35 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
   Widget _buildResultadoUnidad() {
     final r = _resultadoUnidad!;
     return Card(
-      elevation: 2,
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Resultado',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 22,
                   ),
             ),
-            const Divider(height: 16),
-            _buildFilaResultado('Costo Total', _formatearMonto(r.costoTotal)),
-            _buildFilaResultado('Margen', '${_formatearNumero(r.porcentajeMargen)}%'),
-            const Divider(height: 16),
+            const Divider(height: 20, thickness: 1.2),
+            _buildFilaResultado('Costo Total', _formatearMonto(r.costoTotal), fontSize: 17),
+            _buildFilaResultado('Margen', '${_formatearNumero(r.porcentajeMargen)}%', fontSize: 17),
+            const Divider(height: 20, thickness: 1.2),
             _buildFilaResultado(
               'Precio Venta Sugerido',
               _formatearMonto(r.precioVentaSugerido),
               esDestacado: true,
+              fontSize: 20,
             ),
             _buildFilaResultado(
               'Ganancia Unitaria',
               _formatearMonto(r.gananciaUnitaria),
               esDestacado: true,
+              fontSize: 20,
             ),
           ],
         ),
@@ -210,10 +221,13 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
         children: [
           TextFormField(
             controller: _costoTotalKiloController,
+            style: const TextStyle(fontSize: 18),
             decoration: const InputDecoration(
               labelText: 'Costo Total (\$)',
+              labelStyle: TextStyle(fontSize: 16),
               prefixIcon: Icon(Icons.attach_money),
               border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
@@ -230,10 +244,13 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _pesoKilosController,
+            style: const TextStyle(fontSize: 18),
             decoration: const InputDecoration(
               labelText: 'Peso Total (Kg)',
+              labelStyle: TextStyle(fontSize: 16),
               prefixIcon: Icon(Icons.monitor_weight),
               border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
@@ -250,10 +267,13 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
           const SizedBox(height: 16),
           TextFormField(
             controller: _margenKiloController,
+            style: const TextStyle(fontSize: 18),
             decoration: const InputDecoration(
               labelText: 'Margen de Ganancia (%)',
+              labelStyle: TextStyle(fontSize: 16),
               prefixIcon: Icon(Icons.percent),
               border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
@@ -267,22 +287,23 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
               return null;
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           FilledButton.icon(
             onPressed: _isCalculando ? null : _calcularKilo,
             icon: _isCalculando
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
-                : const Icon(Icons.calculate),
-            label: const Text('Calcular'),
+                : const Icon(Icons.calculate, size: 22),
+            label: const Text('Calcular', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
             style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           if (_resultadoKilo != null) _buildResultadoKilo(),
         ],
       ),
@@ -292,36 +313,41 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
   Widget _buildResultadoKilo() {
     final r = _resultadoKilo!;
     return Card(
-      elevation: 2,
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Resultado',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 22,
                   ),
             ),
-            const Divider(height: 16),
-            _buildFilaResultado('Costo Total', _formatearMonto(r.costoTotal)),
-            _buildFilaResultado('Peso Total', '${_formatearNumero(r.pesoKilos)} Kg'),
-            _buildFilaResultado('Margen', '${_formatearNumero(r.porcentajeMargen)}%'),
-            const Divider(height: 16),
+            const Divider(height: 20, thickness: 1.2),
+            _buildFilaResultado('Costo Total', _formatearMonto(r.costoTotal), fontSize: 17),
+            _buildFilaResultado('Peso Total', '${_formatearNumero(r.pesoKilos)} Kg', fontSize: 17),
+            _buildFilaResultado('Margen', '${_formatearNumero(r.porcentajeMargen)}%', fontSize: 17),
+            const Divider(height: 20, thickness: 1.2),
             _buildFilaResultado(
               'Costo por Kilo',
               _formatearMonto(r.costoPorKilo),
+              fontSize: 18,
             ),
             _buildFilaResultado(
               'Precio Venta Sugerido por Kilo',
               _formatearMonto(r.precioVentaSugeridoKilo),
               esDestacado: true,
+              fontSize: 20,
             ),
             _buildFilaResultado(
               'Ganancia por Kilo',
               _formatearMonto(r.gananciaKilo),
               esDestacado: true,
+              fontSize: 20,
             ),
           ],
         ),
@@ -329,9 +355,9 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
     );
   }
 
-  Widget _buildFilaResultado(String etiqueta, String valor, {bool esDestacado = false}) {
+  Widget _buildFilaResultado(String etiqueta, String valor, {bool esDestacado = false, double fontSize = 16}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -340,6 +366,7 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: esDestacado ? Theme.of(context).colorScheme.primary : null,
                   fontWeight: esDestacado ? FontWeight.w600 : FontWeight.normal,
+                  fontSize: fontSize,
                 ),
           ),
           Text(
@@ -347,6 +374,7 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: esDestacado ? Theme.of(context).colorScheme.primary : null,
+                  fontSize: fontSize,
                 ),
           ),
         ],
@@ -365,6 +393,7 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
             'Calculadora de Precios',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  fontSize: 28,
                 ),
           ),
           const SizedBox(height: 8),
@@ -372,20 +401,25 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
             'Calcule precios de venta y ganancias según el modo seleccionado',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 15,
                 ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           SegmentedButton<int>(
+            style: ButtonStyle(
+              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 14)),
+              textStyle: WidgetStateProperty.all(const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+            ),
             segments: const [
               ButtonSegment(
                 value: 0,
                 label: Text('Por Unidad'),
-                icon: Icon(Icons.format_list_numbered),
+                icon: Icon(Icons.format_list_numbered, size: 20),
               ),
               ButtonSegment(
                 value: 1,
                 label: Text('Por Kilo'),
-                icon: Icon(Icons.monitor_weight),
+                icon: Icon(Icons.monitor_weight, size: 20),
               ),
             ],
             selected: {_modoSeleccionado},
@@ -397,7 +431,7 @@ class _VistaCalculadoraState extends State<VistaCalculadora> {
               });
             },
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
           Expanded(
             child: SingleChildScrollView(
               child: _modoSeleccionado == 0 ? _buildModoUnidad() : _buildModoKilo(),
