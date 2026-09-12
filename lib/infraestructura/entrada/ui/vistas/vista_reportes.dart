@@ -92,9 +92,9 @@ class _VistaReportesState extends State<VistaReportes> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Reporte PDF generado correctamente'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Text('Reporte PDF generado correctamente'),
+            backgroundColor: Colors.green.shade700,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -104,7 +104,7 @@ class _VistaReportesState extends State<VistaReportes> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al exportar PDF: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -269,7 +269,7 @@ class _VistaReportesState extends State<VistaReportes> {
                     'Total Ingresos',
                     _formatearMonto(r.totalIngresos),
                     'Ef: ${_formatearMonto(r.ingresosEfectivo)} | Transf: ${_formatearMonto(r.ingresosTransferencia)}',
-                    Colors.green,
+                    Colors.green.shade700,
                     Icons.arrow_downward,
                   ),
                 ),
@@ -281,7 +281,7 @@ class _VistaReportesState extends State<VistaReportes> {
                     'Total Egresos',
                     _formatearMonto(r.totalEgresos),
                     'Ef: ${_formatearMonto(r.egresosEfectivo)} | Transf: ${_formatearMonto(r.egresosTransferencia)}',
-                    Colors.red,
+                    Colors.red.shade600,
                     Icons.arrow_upward,
                   ),
                 ),
@@ -294,7 +294,7 @@ class _VistaReportesState extends State<VistaReportes> {
                     'Saldo Efectivo',
                     _formatearMonto(r.totalEfectivo),
                     'Ing: ${_formatearMonto(r.ingresosEfectivo)} - Egr: ${_formatearMonto(r.egresosEfectivo)}',
-                    Colors.blue,
+                    Colors.blue.shade700,
                     Icons.money,
                   ),
                 ),
@@ -306,7 +306,7 @@ class _VistaReportesState extends State<VistaReportes> {
                     'Saldo Transferencia',
                     _formatearMonto(r.totalTransferencia),
                     'Ing: ${_formatearMonto(r.ingresosTransferencia)} - Egr: ${_formatearMonto(r.egresosTransferencia)}',
-                    Colors.purple,
+                    Colors.deepPurple.shade600,
                     Icons.account_balance,
                   ),
                 ),
@@ -317,7 +317,7 @@ class _VistaReportesState extends State<VistaReportes> {
                   'Balance Total',
                   _formatearMonto(r.balanceNeto),
                   'Ingresos: ${_formatearMonto(r.totalIngresos)} - Egresos: ${_formatearMonto(r.totalEgresos)}',
-                  r.balanceNeto >= 0 ? Colors.green : Colors.red,
+                  r.balanceNeto >= 0 ? Colors.green.shade700 : Colors.red.shade600,
                   Icons.balance,
                 ),
               ),
@@ -456,12 +456,12 @@ class _VistaReportesState extends State<VistaReportes> {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: (esIngreso ? Colors.green : Colors.red).withValues(alpha: 0.15),
+                          color: (esIngreso ? Colors.green.shade700 : Colors.red.shade600).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
-                          color: esIngreso ? Colors.green : Colors.red,
+                          color: esIngreso ? Colors.green.shade700 : Colors.red.shade600,
                           size: 24,
                         ),
                       ),
@@ -475,6 +475,7 @@ class _VistaReportesState extends State<VistaReportes> {
                               style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
+                                color: Colors.black87,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -498,14 +499,14 @@ class _VistaReportesState extends State<VistaReportes> {
                             style: TextStyle(
                               fontSize: 19,
                               fontWeight: FontWeight.bold,
-                              color: esIngreso ? Colors.green : Colors.red,
+                              color: esIngreso ? Colors.green.shade700 : Colors.red.shade600,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                             decoration: BoxDecoration(
-                              color: (t.medioPago == MedioPago.efectivo ? Colors.blue : Colors.purple).withValues(alpha: 0.12),
+                              color: (t.medioPago == MedioPago.efectivo ? Colors.blue.shade700 : Colors.deepPurple.shade600).withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -513,7 +514,7 @@ class _VistaReportesState extends State<VistaReportes> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: t.medioPago == MedioPago.efectivo ? Colors.blue : Colors.purple,
+                                color: t.medioPago == MedioPago.efectivo ? Colors.blue.shade700 : Colors.deepPurple.shade600,
                               ),
                             ),
                           ),

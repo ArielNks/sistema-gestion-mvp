@@ -59,7 +59,7 @@ class _VistaCajaState extends State<VistaCaja> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al cargar movimientos: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade600,
           ),
         );
       }
@@ -97,8 +97,8 @@ class _VistaCajaState extends State<VistaCaja> {
                   : 'Egreso registrado correctamente',
             ),
             backgroundColor: tipo == tipo_movimiento.TipoMovimiento.ingreso
-                ? Colors.green
-                : Colors.red,
+                ? Colors.green.shade700
+                : Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
@@ -110,7 +110,7 @@ class _VistaCajaState extends State<VistaCaja> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al registrar: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
@@ -183,14 +183,14 @@ class _VistaCajaState extends State<VistaCaja> {
                         focusNode: _montoFocus,
                         autofocus: true,
                         style: const TextStyle(fontSize: 19),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Monto (\$)',
-                          labelStyle: TextStyle(fontSize: 16),
-                          prefixIcon: Icon(Icons.attach_money, size: 24),
+                          labelStyle: TextStyle(fontSize: 16, color: colorScheme.onSurfaceVariant),
+                          prefixIcon: Icon(Icons.attach_money, size: 24, color: colorScheme.onSurfaceVariant),
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                           hintText: '0.00',
-                          hintStyle: TextStyle(fontSize: 17, color: Colors.grey),
+                          hintStyle: TextStyle(fontSize: 17, color: Colors.grey.shade400),
                         ),
                         keyboardType:
                             const TextInputType.numberWithOptions(decimal: true),
@@ -214,14 +214,14 @@ class _VistaCajaState extends State<VistaCaja> {
                         controller: _descripcionController,
                         focusNode: _descFocus,
                         style: const TextStyle(fontSize: 17),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Descripción (opcional)',
-                          labelStyle: TextStyle(fontSize: 16),
-                          prefixIcon: Icon(Icons.description, size: 24),
+                          labelStyle: TextStyle(fontSize: 16, color: colorScheme.onSurfaceVariant),
+                          prefixIcon: Icon(Icons.description, size: 24, color: colorScheme.onSurfaceVariant),
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                           hintText: 'Ej: Venta de productos, pago de servicios...',
-                          hintStyle: TextStyle(fontSize: 15, color: Colors.grey),
+                          hintStyle: TextStyle(fontSize: 15, color: Colors.grey.shade400),
                         ),
                         maxLines: 2,
                         textInputAction: TextInputAction.done,
@@ -229,11 +229,11 @@ class _VistaCajaState extends State<VistaCaja> {
                       const SizedBox(height: 20),
                       DropdownButtonFormField<MedioPago>(
                         initialValue: _medioPagoSeleccionado,
-                        style: const TextStyle(fontSize: 17, color: Colors.black),
-                        decoration: const InputDecoration(
+                        style: TextStyle(fontSize: 17, color: colorScheme.onSurface),
+                        decoration: InputDecoration(
                           labelText: 'Medio de Pago',
-                          labelStyle: TextStyle(fontSize: 16),
-                          prefixIcon: Icon(Icons.payment, size: 24),
+                          labelStyle: TextStyle(fontSize: 16, color: colorScheme.onSurfaceVariant),
+                          prefixIcon: Icon(Icons.payment, size: 24, color: colorScheme.onSurfaceVariant),
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                         ),
@@ -276,7 +276,7 @@ class _VistaCajaState extends State<VistaCaja> {
                               label: const Text('Registrar Ingreso',
                                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                               style: FilledButton.styleFrom(
-                                backgroundColor: Colors.green,
+                                backgroundColor: Colors.green.shade700,
                                 padding: const EdgeInsets.symmetric(vertical: 20),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
@@ -303,7 +303,7 @@ class _VistaCajaState extends State<VistaCaja> {
                               label: const Text('Registrar Egreso',
                                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                               style: FilledButton.styleFrom(
-                                backgroundColor: Colors.red,
+                                backgroundColor: Colors.red.shade600,
                                 padding: const EdgeInsets.symmetric(vertical: 20),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
@@ -375,12 +375,12 @@ class _VistaCajaState extends State<VistaCaja> {
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: (esIngreso ? Colors.green : Colors.red).withValues(alpha: 0.15),
+                                    color: (esIngreso ? Colors.green.shade700 : Colors.red.shade600).withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Icon(
                                     esIngreso ? Icons.arrow_downward : Icons.arrow_upward,
-                                    color: esIngreso ? Colors.green : Colors.red,
+                                    color: esIngreso ? Colors.green.shade700 : Colors.red.shade600,
                                     size: 22,
                                   ),
                                 ),
@@ -394,6 +394,7 @@ class _VistaCajaState extends State<VistaCaja> {
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
+                                          color: Colors.black87,
                                         ),
                                       ),
                                       Text(
@@ -416,14 +417,14 @@ class _VistaCajaState extends State<VistaCaja> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: esIngreso ? Colors.green : Colors.red,
+                                        color: esIngreso ? Colors.green.shade700 : Colors.red.shade600,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: (t.medioPago == MedioPago.efectivo ? Colors.blue : Colors.purple).withValues(alpha: 0.12),
+                                        color: (t.medioPago == MedioPago.efectivo ? Colors.blue.shade700 : Colors.deepPurple.shade600).withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
@@ -431,7 +432,7 @@ class _VistaCajaState extends State<VistaCaja> {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
-                                          color: t.medioPago == MedioPago.efectivo ? Colors.blue : Colors.purple,
+                                          color: t.medioPago == MedioPago.efectivo ? Colors.blue.shade700 : Colors.deepPurple.shade600,
                                         ),
                                       ),
                                     ),
