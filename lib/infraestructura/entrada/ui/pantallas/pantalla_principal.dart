@@ -16,60 +16,24 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
 
   static const List<NavigationRailDestination> _destinos = [
     NavigationRailDestination(
-      icon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.calculate_outlined),
-      ),
-      selectedIcon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.calculate),
-      ),
-      label: Text(
-        'Calculadora',
-        style: TextStyle(fontSize: 12, height: 1.1),
-      ),
+      icon: Icon(Icons.calculate_outlined),
+      selectedIcon: Icon(Icons.calculate),
+      label: Text('Calculadora'),
     ),
     NavigationRailDestination(
-      icon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.point_of_sale_outlined),
-      ),
-      selectedIcon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.point_of_sale),
-      ),
-      label: Text(
-        'Caja',
-        style: TextStyle(fontSize: 12, height: 1.1),
-      ),
+      icon: Icon(Icons.point_of_sale_outlined),
+      selectedIcon: Icon(Icons.point_of_sale),
+      label: Text('Caja'),
     ),
     NavigationRailDestination(
-      icon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.receipt_long_outlined),
-      ),
-      selectedIcon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.receipt_long),
-      ),
-      label: Text(
-        'Arqueo Diario',
-        style: TextStyle(fontSize: 12, height: 1.1),
-      ),
+      icon: Icon(Icons.receipt_long_outlined),
+      selectedIcon: Icon(Icons.receipt_long),
+      label: Text('Arqueo Diario'),
     ),
     NavigationRailDestination(
-      icon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.analytics_outlined),
-      ),
-      selectedIcon: Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Icon(Icons.analytics),
-      ),
-      label: Text(
-        'Reportes',
-        style: TextStyle(fontSize: 12, height: 1.1),
-      ),
+      icon: Icon(Icons.analytics_outlined),
+      selectedIcon: Icon(Icons.analytics),
+      label: Text('Reportes'),
     ),
   ];
 
